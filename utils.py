@@ -62,7 +62,13 @@ def getExistingCourses():
         print ("Exception while reading from " + directory + " . Continuing...")
     return course_ids
 
-
+def str2bool(v):
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        return False
 #print("Length : " + str(len(races)) )
 #existing_courses = getExistingCourses()
 #courses = [123, 342342, 1187893]

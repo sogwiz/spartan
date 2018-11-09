@@ -5,10 +5,12 @@ import sys
 import getopt
 import time
 import os.path
+from concurrent.futures import ThreadPoolExecutor
+import threading
 from spartan_models import Race
 from spartan2 import Athlinks
 from spartan3 import CourseResult
-from utils import getExistingEvents, getExistingRaces, getRaceDetails, getExistingCourses
+from utils import getExistingEvents, getExistingRaces, getRaceDetails, getExistingCourses, str2bool
 
 
 class Spartan:
@@ -54,25 +56,88 @@ class Spartan:
         return races
 
 
+def requestRace(race, raceDetailsList, writefiles, athlinks):
+    print("requestRace " + str(race.race_id) +
+          " assigned to thread: {}".format(threading.current_thread().name))
+    # make a request to athlinks to get the list of courses
+    # this can be done in parallel
+
+    raceDetails = athlinks.getRaceDetails(race)
+    if(raceDetails is not None):
+        raceDetailsJson = raceDetails.json()
+        # raceDetailsJson['_id']= str(race)
+        raceDetailsJson['subevent_id'] = race.subevent_id
+        raceDetailsJson['event_id'] = race.event_id
+        raceDetailsJson['_id'] = str(raceDetailsJson['RaceID'])
+        raceDetailsList.append(raceDetailsJson)
+
+        directory = 'races'
+        filename = 'races' + '/' + str(race.race_id) + '.json'
+        if(writefiles == True):
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+            with open(filename, 'w') as writer:
+                json.dump(raceDetailsJson, writer)
+    return "finished race request: " + str(race.race_id)
+
+
+def requestRaceCourses(race, existing_courses, apikey, writefiles):
+    courseResultsList = []
+    for course in race['Courses']:
+        courseResult = CourseResult(apikey)
+        # time.sleep(1)
+        if course['CourseID'] in existing_courses:
+            print("skipping course " + str(course['CourseID']))
+        else:
+            print("need to fetch data for course " +
+                    str(course['CourseID']) + "\t and race = " + str(race['RaceID']))
+            result = courseResult.getCourseResult(
+                race['RaceID'], course['CourseID'])
+            if(result is not None):
+                resultJson = result.json()
+                resultJson['subevent_id'] = race['subevent_id']
+                resultJson['event_id'] = race['event_id']
+                resultJson['_id'] = str(course['CourseID'])
+                courseResultsList.append(resultJson)
+        if(writefiles == True):
+            filename = "event_" + \
+                str(race['event_id']) + "_race_" + \
+                str(race['RaceID']) + ".json"
+            directory = 'course_results'
+            file = directory + '/'+filename
+            # check if len of courseResultsList!=0 as well
+            if len(courseResultsList) != 0:
+                if os.path.isfile(file):
+                    print("File already exists! " + file +
+                          " for course " + str(course['CourseID']))
+                else:
+                    if not os.path.exists(directory):
+                        os.makedirs(directory)
+                    with open(file, 'w') as outfile:
+                        json.dump(courseResultsList, outfile)
+
+
 def main():
     apikey = ''
     writefiles = False
     threads = 1
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "a:w:t:h", ["apikey=", "writefiles=", "threads="])
+        opts, args = getopt.getopt(sys.argv[1:], "a:w:t:h", [
+                                   "apikey=", "writefiles=", "threads="])
     except getopt.GetoptError:
         print('spartan1.py -a <Athlinks API Key> -w <Write To File = True/False> -t <Threads Count>')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print('spartan1.py -a <Athlinks API Key> -w <Write To File = True/False> -t <Threads Count>')
+            print(
+                'spartan1.py -a <Athlinks API Key> -w <Write To File = True/False> -t <Threads Count>')
             sys.exit()
         elif opt in ("-a", "--apikey"):
             apikey = arg
         elif opt in ("-w", "--writefiles"):
-            writefiles = bool(arg)
+            writefiles = str2bool(arg)
         elif opt in ("-t", "--threads"):
-            threads = arg
+            threads = int(arg)
     print('Write To Files : ', str(writefiles))
     print('Threads count : ', str(threads))
 
@@ -92,76 +157,32 @@ def main():
 
     athlinks = Athlinks(apikey)
     raceDetailsList = []
-    for race in races:
-        # make a request to athlinks to get the list of courses
-        # this can be done in parallel
-        if(race.race_id in existing_races):
-            # print("found a match with " + race.race_id)
-            # merge the two lists into one rather than append
-            raceDetailsList.append(getRaceDetails(race))
-            continue
 
-        raceDetails = athlinks.getRaceDetails(race)
-        if(raceDetails is not None):
-            raceDetailsJson = raceDetails.json()
-            # raceDetailsJson['_id']= str(race)
-            raceDetailsJson['subevent_id'] = race.subevent_id
-            raceDetailsJson['event_id'] = race.event_id
-            raceDetailsJson['_id'] = str(raceDetailsJson['RaceID'])
-            raceDetailsList.append(raceDetailsJson)
+    # this WILL wait until all are done
+    with ThreadPoolExecutor(max_workers=threads) as executor:
+        for race in races:
+            if(race.race_id in existing_races):
+                # print("found a match with " + race.race_id)
+                # merge the two lists into one rather than append
+                raceDetailsList.append(getRaceDetails(race))
+            else:
+                if(str(race.race_id) !="0"):
+                    executor.submit(requestRace, race,
+                                    raceDetailsList, writefiles, athlinks)
 
-            directory = 'races'
-            filename = 'races' + '/' + str(race.race_id) + '.json'
-            if(writefiles == True):
-                if not os.path.exists(directory):
-                    os.makedirs(directory)
-                with open(filename, 'w') as writer:
-                    json.dump(raceDetailsJson, writer)
-                    # writer.write_all(raceDetailsList)
-
-        # for each courseId of race, make a request to athlinks
-        # this can be done in parallel
-        # print(str(len(raceDetailsList)))
-
+            # for each courseId of race, make a request to athlinks
+            # this can be done in parallel
+            # print(str(len(raceDetailsList)))
+    
     existing_courses = getExistingCourses()
 
-    for race in raceDetailsList:
-        courseResultsList = []
-        for course in race['Courses']:
-            courseResult = CourseResult(apikey)
-            # time.sleep(1)
-            if course['CourseID'] in existing_courses:
-                print("skipping course " + str(course['CourseID']))
-            else:
-                print("need to fetch data for course " +
-                        str(course['CourseID']) + "\t and race = " + str(race['RaceID']))
-                result = courseResult.getCourseResult(
-                    race['RaceID'], course['CourseID'])
-                if(result is not None):
-                    resultJson = result.json()
-                    resultJson['subevent_id'] = race['subevent_id']
-                    resultJson['event_id'] = race['event_id']
-                    resultJson['_id'] = str(course['CourseID'])
-                    courseResultsList.append(resultJson)
-        if(writefiles == True):
-            filename = "event_" + \
-                str(race['event_id']) + "_race_" + \
-                str(race['RaceID']) + ".json"
-            directory = 'course_results'
-            file = directory + '/'+filename
-            # check if len of courseResultsList!=0 as well
-            if len(courseResultsList) != 0:
-                if os.path.isfile(file):
-                    print("File already exists! " + file +
-                            " for course " + str(course['CourseID']))
-                else:
-                    if not os.path.exists(directory):
-                        os.makedirs(directory)
-                    with open(file, 'w') as outfile:
-                        json.dump(courseResultsList, outfile)
+    start = time.time()
+    with ThreadPoolExecutor(max_workers=threads) as executor:
+        for race in raceDetailsList:
+            executor.submit(requestRaceCourses,race, existing_courses, apikey, writefiles)
 
-                # writer.write_all(courseResultsList)
-
+    end = time.time()
+    #print("\n\n\n****\nGetting Courses took: " + str(end - start) + "\n*****\n\n")
 
 if __name__ == "__main__":
     main()
