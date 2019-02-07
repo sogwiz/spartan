@@ -9,6 +9,8 @@ def getRaceDetails(race):
         race_dict = json.load(f)
         return race_dict
 
+#20190206: SB: I think this function tries to see the events by looking
+#at the filename of the course_results and then splitting to get the event id
 def getExistingEvents():
     directory = "course_results"
     events = {}

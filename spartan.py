@@ -16,7 +16,7 @@ from utils import getExistingEvents, getExistingRaces, getRaceDetails, getExisti
 class Spartan:
     response = ""
     url = "https://api.spartan.com/api/events/upcoming_past_planned_groups/"
-    querystring = {"ulimit": "0", "plimit": "5",
+    querystring = {"ulimit": "0", "plimit": "1000",
                    "country": "USA", "page": "0"}
     headers = {
         'Pragma': "no-cache",
@@ -125,12 +125,12 @@ def main():
         opts, args = getopt.getopt(sys.argv[1:], "a:w:t:h", [
                                    "apikey=", "writefiles=", "threads="])
     except getopt.GetoptError:
-        print('spartan1.py -a <Athlinks API Key> -w <Write To File = True/False> -t <Threads Count>')
+        print('spartan.py -a <Athlinks API Key> -w <Write To File = True/False> -t <Threads Count>')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
             print(
-                'spartan1.py -a <Athlinks API Key> -w <Write To File = True/False> -t <Threads Count>')
+                'spartan.py -a <Athlinks API Key> -w <Write To File = True/False> -t <Threads Count>')
             sys.exit()
         elif opt in ("-a", "--apikey"):
             apikey = arg
@@ -144,6 +144,7 @@ def main():
     spartan = Spartan()
     races = spartan.makeRequests(writefiles)
 
+    #existing_events variable isn't used for anything
     existing_events = getExistingEvents()
     existing_races = getExistingRaces()
 
