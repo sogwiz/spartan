@@ -29,6 +29,8 @@ maprcli table delete -path $TABLE_COURSE_RESULTS
 maprcli table create -path $TABLE_EVENTS -tabletype json
 maprcli table create -path $TABLE_RACES -tabletype json
 maprcli table create -path $TABLE_COURSE_RESULTS -tabletype json
+#create a secondary index on this table for field RaceEntries.List[].DisplayName
+
 
 #load data into events table
 mapr importJSON -idfield "id" -src $DATA_DIR/events.json -dst $TABLE_EVENTS -mapreduce false

@@ -51,7 +51,7 @@ class Spartan:
                 # remove empty keys
                 # d = dict( [(k,v) for k,v in event.items() if len(v)>0])
                 # pastevents[i]=d
-            with open('past_test.json', 'w') as outfile:
+            with open('events.json', 'w') as outfile:
                 json.dump(pastevents, outfile)
         return races
 
@@ -102,7 +102,8 @@ def requestRaceCourses(race, existing_courses, apikey, writefiles):
         if(writefiles == True):
             filename = "event_" + \
                 str(race['event_id']) + "_race_" + \
-                str(race['RaceID']) + ".json"
+                str(race['RaceID']) + \
+                "_course_" + str(course['CourseID']) + ".json"
             directory = 'course_results'
             file = directory + '/'+filename
             # check if len of courseResultsList!=0 as well
