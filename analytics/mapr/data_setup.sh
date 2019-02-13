@@ -5,6 +5,8 @@ TABLE_COURSE_RESULTS=/apps/course_results
 TMP_DATA_DIR=/tmp/data
 
 cd /tmp/
+#wget https://s3-us-west-2.amazonaws.com/anaik-kops-test/data.zip
+
 rm -rf $TMP_DATA_DIR
 mkdir $TMP_DATA_DIR
 cd $TMP_DATA_DIR
