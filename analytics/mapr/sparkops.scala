@@ -20,4 +20,5 @@ case class Event (_id:String,
             event_name: String), 
             @JsonProperty("subevents") subevents: List[String])
 
-    
+val c = array_contains(column = $"RaceEntries.List.DisplayName", value = "sargon benjamin")
+courseResults.filter(c).select("CourseName","EventCourseID","ResultsDate").show(50,false)

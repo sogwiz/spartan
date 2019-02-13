@@ -10,7 +10,7 @@ import threading
 from spartan_models import Race
 from spartan2 import Athlinks
 from spartan3 import CourseResult
-from utils import getExistingEvents, getExistingRaces, getRaceDetails, getExistingCourses, str2bool
+from utils import getExistingEvents, getExistingRaces, getRaceDetails, getExistingCourses, normalizeCourseResults, str2bool
 
 
 class Spartan:
@@ -82,8 +82,9 @@ def requestRace(race, raceDetailsList, writefiles, athlinks):
 
 
 def requestRaceCourses(race, existing_courses, apikey, writefiles):
-    courseResultsList = []
+    
     for course in race['Courses']:
+        courseResultsList = []
         courseResult = CourseResult(apikey)
         # time.sleep(1)
         if course['CourseID'] in existing_courses:
@@ -185,6 +186,10 @@ def main():
 
     end = time.time()
     #print("\n\n\n****\nGetting Courses took: " + str(end - start) + "\n*****\n\n")
+    print("Completed data fetch")
+    print("Normalizing course results....")
+    normalizeCourseResults()
+
 
 if __name__ == "__main__":
     main()

@@ -3,6 +3,7 @@ from mapr.ojai.storage.ConnectionFactory import ConnectionFactory
 import getopt
 import sys
 import time
+import logging
 
 class SpartanQuery:
     
@@ -19,28 +20,32 @@ class SpartanQuery:
     def queryResultsByUser(self, user):
         connection = ConnectionFactory.get_connection(self.connection_string)
         document_store = connection.get_store(store_path='/apps/course_results')
-        #query_dict = {"$select":["RaceEntries.List[]","CourseID","CourseName", "RaceID"]}
         #query_dict = {"$select":["RaceEntries.List[1].EventCourseID"],"$where":{"$like":{"RaceEntries.List[].DisplayName":"sargon%benjamin"}}}
-        query_dict = {"$select":["CourseID","CourseName","RaceID"],"$where":{"$like":{"RaceEntries.List[].DisplayName":"sargon%"}}}
+        #query_dict = {"$select":["CourseID","CourseName","RaceID"],"$where":{"$matches":{"RaceEntries.List[].DisplayName":"(?i)"+user}}}
         #query_dict = {"$select":["CourseID","CourseName","RaceID","RaceEntries.List[].DisplayName"],"$where":{"$like":{"RaceEntries.List[].DisplayName":"sargon%"}}}
+        query_dict = {"$where":{"$like":{"DisplayName":"sargon%benjamin"}}}
 
         start = time.time()
         query_result = document_store.find(query_dict,options=self.options)
 
         iterations = 0
         raceEntries = 0
+        raceIds = list()
+        courseIds = list()
 
         print(query_result.get_query_plan())
 
         for item in query_result:
             iterations+=1
-            print (item.as_dictionary())
+            #print (item.as_dictionary())
 
             row = item.as_dictionary()
             courseId = row['CourseID']
+            courseIds.append(courseId)
             courseName = row['CourseName']
+            raceIds.append(row['RaceID'])
             #racers = row['RaceEntries']['List']
-            print("Race : " + str(row['RaceID']) + " Course: " + str(courseId) + " " + courseName)
+            print("Race : " + str(row['RaceID']) + " Course: " + str(courseId) + " " + courseName + " event_id: " + str(row['event_id']))
             #print("Race : " + str(row['RaceID']) + " Course: " + str(courseId) + " " + courseName + " with " + str(len(racers)))
 
             #raceEntries+=len(racers)
@@ -52,10 +57,27 @@ class SpartanQuery:
         print("Duration = " + str(end - start))
         print("iterations is " + str(iterations))
         connection.close()
+    
+    def queryRaceInfo(self, raceIds):
+        connection = ConnectionFactory.get_connection(self.connection_string)
+        document_store = connection.get_store(store_path='/apps/races')
+        query_dict = {"$select":["RaceID","RaceName","StateProvName","WebSite"],"$where":{"$in":{"RaceID":raceIds}}}
+        start = time.time()
+        query_result = document_store.find(query_dict,options=self.options)
 
+        iterations = 0
+        for item in query_result:
+            iterations+=1
+            print (item.as_dictionary())
+        
+        end = time.time()
+        print("Duration = " + str(end - start))
+        print("iterations is " + str(iterations))
+        connection.close()
 
 
 def main():
+    logging.basicConfig(filename='myapp.log', level=logging.DEBUG)
     urlString = ''
     password = ''
 
@@ -76,7 +98,10 @@ def main():
             password = arg
     
     spartanQuery = SpartanQuery(urlString)
-    spartanQuery.queryResultsByUser("Sargon Benjamin")
+    #spartanQuery.queryResultsByUser("robert killian")
+    spartanQuery.queryResultsByUser("sargon benjamin")
+    #raceIds = [677643,730535,689075]
+    #spartanQuery.queryRaceInfo(raceIds)
 
 
 if __name__ == "__main__":
