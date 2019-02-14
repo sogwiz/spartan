@@ -2,6 +2,7 @@ import os
 import json
 from spartan_models import Race
 from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 import threading
 import time
 
@@ -103,7 +104,9 @@ def normalizeCourseResults(directory='course_results'):
     start = time.time()
     try:
         # this WILL wait until all are done
-        with ThreadPoolExecutor(max_workers=8) as executor:
+        # ThreadPoolExecutor with 4 threads took 279 seconds
+        # ProcessPoolExecutor with 4 processes took 179 seconds
+        with ProcessPoolExecutor(max_workers=4) as executor:
             for filename in os.listdir(directory):
                 if filename.endswith(".json") :
                     executor.submit(normalizeCourseResultsHelper,directory,filename,newDir)
