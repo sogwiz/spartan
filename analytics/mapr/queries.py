@@ -23,7 +23,7 @@ class SpartanQuery:
         #query_dict = {"$select":["RaceEntries.List[1].EventCourseID"],"$where":{"$like":{"RaceEntries.List[].DisplayName":"sargon%benjamin"}}}
         #query_dict = {"$select":["CourseID","CourseName","RaceID"],"$where":{"$matches":{"RaceEntries.List[].DisplayName":"(?i)"+user}}}
         #query_dict = {"$select":["CourseID","CourseName","RaceID","RaceEntries.List[].DisplayName"],"$where":{"$like":{"RaceEntries.List[].DisplayName":"sargon%"}}}
-        query_dict = {"$where":{"$like":{"DisplayName":"sargon%benjamin"}}}
+        query_dict = {"$select":["event_id","RaceID","CourseName","CoursePattern","DisplayName","TicksString"],"$where":{"$like":{"DisplayName":user}}}
 
         start = time.time()
         query_result = document_store.find(query_dict,options=self.options)
@@ -31,7 +31,7 @@ class SpartanQuery:
         iterations = 0
         raceEntries = 0
         raceIds = list()
-        courseIds = list()
+        #courseIds = list()
 
         print(query_result.get_query_plan())
 
@@ -40,12 +40,12 @@ class SpartanQuery:
             #print (item.as_dictionary())
 
             row = item.as_dictionary()
-            courseId = row['CourseID']
-            courseIds.append(courseId)
+            #courseId = row['CourseID']
+            #courseIds.append(courseId)
             courseName = row['CourseName']
             raceIds.append(row['RaceID'])
             #racers = row['RaceEntries']['List']
-            print("Race : " + str(row['RaceID']) + " Course: " + str(courseId) + " " + courseName + " event_id: " + str(row['event_id']))
+            print("Race : " + str(row['RaceID']) + " CoursePattern: " + str(row['CoursePattern']) + " " + courseName + " Time : " + str(row['TicksString']) +" event_id: " + str(row['event_id']))
             #print("Race : " + str(row['RaceID']) + " Course: " + str(courseId) + " " + courseName + " with " + str(len(racers)))
 
             #raceEntries+=len(racers)

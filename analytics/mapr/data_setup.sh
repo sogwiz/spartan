@@ -49,8 +49,8 @@ maprcli table create -path $TABLE_COURSE_RESULTS -tabletype json
 echo "Created tables $TABLE_EVENTS $TABLE_RACES $TABLE_COURSE_RESULTS"
 
 #create a secondary indexes
-maprcli table index add -path $TABLE_COURSE_RESULTS -index racer_display_name -indexedfields DisplayName -includedfields CourseName,CoursePattern,RaceID,event_id,Age,BibNum,RacerID,Ticks,TicksString
-maprcli table index add -path $TABLE_COURSE_RESULTS -index racer_id -indexedfields RacerID -includedfields CourseName,CoursePattern,RaceID,event_id,Age,BibNum,DisplayName,Ticks,TicksString
+maprcli table index add -path $TABLE_COURSE_RESULTS -index racer_display_name -indexedfields DisplayName -includedfields CourseID,CourseName,CoursePattern,RaceID,event_id,Age,BibNum,RacerID,Ticks,TicksString
+maprcli table index add -path $TABLE_COURSE_RESULTS -index racer_id -indexedfields RacerID -includedfields CourseID,CourseName,CoursePattern,RaceID,event_id,Age,BibNum,DisplayName,Ticks,TicksString
 echo "Created secondary indexes on tables"
 
 #create change data capture logs as streams

@@ -1,5 +1,6 @@
 import os
 import json
+import ujson
 from spartan_models import Race
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import ProcessPoolExecutor
@@ -75,7 +76,7 @@ def normalizeCourseResultsHelper(directory,filename, newDir):
     course_results_racers = {}
     file = os.path.join(directory, filename)
     with open(file, 'r') as f:
-        course_results = json.load(f)
+        course_results = ujson.load(f)
         course_results_racers[filename] = list()
         newFile = os.path.join(newDir, filename)
         #why are there multiple course_result objects in each json file?
@@ -91,7 +92,7 @@ def normalizeCourseResultsHelper(directory,filename, newDir):
                 course_result_racer['CourseName'] = str(course_result['CourseName'])
                 course_results_racers[filename].append(course_result_racer)
             with open(newFile, 'w') as outfile:
-                json.dump(course_results_racers[filename], outfile)
+                ujson.dump(course_results_racers[filename], outfile)
     end = time.time()
     #print("Conversion " + filename + " : " + str(end - start))
 

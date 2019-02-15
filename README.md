@@ -39,3 +39,9 @@ cat past.json | sed 's/"": "",//g' | sed 's/, "": ""//g' > past_test2.json
 -- Check to see if we have course races already stored locally
 5. ask Athlinks for Course results (Spartan.requestRaceCourses -> CourseResult.getCourseResult)
 
+
+# Debugging with Visual Studio Code
+            "args" : ["-t", "1", "-w","true","-a","<API KEY>"],
+            "osx": {
+                "pythonPath": "${workspaceFolder}/bin/python"
+            }

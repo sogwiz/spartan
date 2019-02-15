@@ -92,14 +92,32 @@ def requestRaceCourses(race, existing_courses, apikey, writefiles):
         else:
             print("need to fetch data for course " +
                     str(course['CourseID']) + "\t and race = " + str(race['RaceID']))
-            result = courseResult.getCourseResult(
-                race['RaceID'], course['CourseID'])
-            if(result is not None):
-                resultJson = result.json()
-                resultJson['subevent_id'] = race['subevent_id']
-                resultJson['event_id'] = race['event_id']
-                resultJson['_id'] = str(course['CourseID'])
-                courseResultsList.append(resultJson)
+            page = 1
+            resultCount = 0
+            shouldContinuePaging = True
+            resultJson = None
+            while shouldContinuePaging:    
+                result = courseResult.getCourseResult(
+                    race['RaceID'], course['CourseID'], page)
+                if(result is not None):
+                    if page == 1:
+                        resultJson = result.json()
+                        resultCount = int(resultJson['ResultCount'])
+                        resultJson['subevent_id'] = race['subevent_id']
+                        resultJson['event_id'] = race['event_id']
+                        resultJson['_id'] = str(course['CourseID'])
+                    else:
+                        pageResult = result.json()
+                        resultJson['RaceEntries']['List'].extend(pageResult['RaceEntries']['List'])
+                    
+                    #let's say there's 1700 results, and we've already gotten 2 pages of data
+                    #1700 < 2*1000, so we'll stop at this point
+                    if resultCount < page*500:
+                        shouldContinuePaging = False
+                    
+                    page+=1
+            courseResultsList.append(resultJson)
+                    
         if(writefiles == True):
             filename = "event_" + \
                 str(race['event_id']) + "_race_" + \
