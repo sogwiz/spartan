@@ -10,7 +10,23 @@ TMP_DATA_DIR=/tmp/data
 
 cd /tmp/
 rm -f data.zip
-wget https://s3-us-west-2.amazonaws.com/anaik-kops-test/data.zip
+
+
+FILE=""
+
+#if no params supplied, then use the small file
+if [[ $# -eq 0 ]] ; then
+    echo "Using Small File"
+    FILE="https://s3-us-west-2.amazonaws.com/anaik-kops-test/small/data.zip"
+else
+    #this is the big file. To use this, just supply any parameter to the shell script
+    echo "Using Big File"
+    FILE="https://s3-us-west-2.amazonaws.com/anaik-kops-test/data.zip" 
+fi
+
+echo "Downloading $FILE"
+
+wget $FILE
 
 rm -rf $TMP_DATA_DIR
 mkdir $TMP_DATA_DIR
