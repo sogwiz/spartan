@@ -16,8 +16,8 @@ from utils import getExistingEvents, getExistingRaces, getRaceDetails, getExisti
 class Spartan:
     response = ""
     url = "https://api.spartan.com/api/events/upcoming_past_planned_groups/"
-    querystring = {"ulimit": "0", "plimit": "1000",
-                   "country": "USA", "page": "0"}
+    #querystring = {"ulimit": "0", "plimit": "1000","country": "USA", "page": "0"}
+    querystring = {"ulimit": "0", "plimit": "100", "page": "0"}
     headers = {
         'Pragma': "no-cache",
         'Origin': "https://www.spartan.com",

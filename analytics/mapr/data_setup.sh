@@ -1,3 +1,7 @@
+#usage: ./script.sh xlarge (will download the xlarge data set, 280mb)
+#usage: ./script.sh small (will download the small data set, 73mb)
+#usage: ./script.sh (will download the normal sized data set, 186mb)
+
 DATA_DIR=/user/mapr/spartan
 TABLE_EVENTS=/apps/events
 TABLE_RACES=/apps/races
@@ -11,17 +15,17 @@ TMP_DATA_DIR=/tmp/data
 cd /tmp/
 rm -f data.zip
 
-
+#first parameter is the file size to use (small, xlarge)
 FILE=""
 
-#if no params supplied, then use the small file
+#if no params supplied, then use the medium file
 if [[ $# -eq 0 ]] ; then
-    echo "Using Small File"
-    FILE="https://s3-us-west-2.amazonaws.com/anaik-kops-test/small/data.zip"
+    echo "Using medium File"
+    FILE="https://s3-us-west-2.amazonaws.com/anaik-kops-test/data.zip"
 else
     #this is the big file. To use this, just supply any parameter to the shell script
-    echo "Using Big File"
-    FILE="https://s3-us-west-2.amazonaws.com/anaik-kops-test/data.zip" 
+    echo "Using File in folder $1"
+    FILE="https://s3-us-west-2.amazonaws.com/anaik-kops-test/$1/data.zip" 
 fi
 
 echo "Downloading $FILE"
