@@ -1,6 +1,6 @@
-#usage: ./script.sh xlarge (will download the xlarge data set, 280mb)
-#usage: ./script.sh small (will download the small data set, 73mb)
-#usage: ./script.sh (will download the normal sized data set, 186mb)
+#usage: ./script.sh xlarge (will download the xlarge data set 3+million rows in course_results, 280mb)
+#usage: ./script.sh small (will download the small data set 700,000 rows in course_results, 73mb)
+#usage: ./script.sh (will download the normal sized data set 2.5million rows in course_results, 186mb)
 
 DATA_DIR=/user/mapr/spartan
 TABLE_EVENTS=/apps/events
