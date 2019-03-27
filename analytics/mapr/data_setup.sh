@@ -1,6 +1,6 @@
-#usage: ./script.sh xlarge (will download the xlarge data set 3+million rows in course_results, 280mb)
-#usage: ./script.sh small (will download the small data set 700,000 rows in course_results, 73mb)
-#usage: ./script.sh (will download the normal sized data set 2.5million rows in course_results, 186mb)
+#usage: ./data_setup.sh xlarge (will download the xlarge data set 3+million rows in course_results, 280mb)
+#usage: ./data_setup.sh small (will download the small data set 700,000 rows in course_results, 73mb)
+#usage: ./data_setup.sh (will download the normal sized data set 2.5million rows in course_results, 186mb)
 
 DATA_DIR=/user/mapr/spartan
 TABLE_EVENTS=/apps/events
@@ -41,6 +41,7 @@ unzip /tmp/data.zip
 hadoop fs -rm -r $DATA_DIR
 hadoop fs -mkdir $DATA_DIR
 echo "Removed and created $DATA_DIR"
+sleep 5
 
 #this is needed to avoid maprdb format issues with empty key names
 cat events.json | sed 's/"": "",//g' | sed 's/, "": ""//g' > events2.json

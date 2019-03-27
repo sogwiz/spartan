@@ -98,11 +98,7 @@ def main():
             password = arg
     
     spartanQuery = SpartanQuery(urlString)
-    #spartanQuery.queryResultsByUser("robert killian")
     spartanQuery.queryResultsByUser("sargon benjamin")
-    #raceIds = [677643,730535,689075]
-    #spartanQuery.queryRaceInfo(raceIds)
-
 
 if __name__ == "__main__":
     main()
