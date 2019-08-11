@@ -31,4 +31,5 @@ racesDF = spark.read.json(pathRaces)
 dfRaceSub = racesDF.select('RaceName','RaceDate','subevent_id','event_id','RaceID')
 finalDF = dfRaceSub.join(joinDF,dfRaceSub.subevent_id==joinDF.subevent_id)
 
+#causes pyspark.sql.utils.AnalysisException: u'Found duplicate column(s) when inserting into maprfs
 finalDF.coalesce(1).write.format('json').save(pathCR+".transform")

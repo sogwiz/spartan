@@ -1,6 +1,7 @@
 #usage: ./data_setup.sh xlarge (will download the xlarge data set 3+million rows in course_results, 280mb)
 #usage: ./data_setup.sh small (will download the small data set 700,000 rows in course_results, 73mb)
 #usage: ./data_setup.sh (will download the normal sized data set 2.5million rows in course_results, 186mb)
+# spartan data set on mapr
 
 DATA_DIR=/user/mapr/spartan
 TABLE_EVENTS=/apps/events

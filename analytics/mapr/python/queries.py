@@ -156,7 +156,7 @@ def main():
         elif opt in ("-p", "--password"):
             password = arg
 
-    print("url string is " + urlString)
+    logging.info("url string is " + urlString)
     
     spartanQuery = SpartanQuery(urlString)
     spartanQuery.course_results = spartanQuery.queryResultsByUser("sargon benjamin")
@@ -169,7 +169,6 @@ def main():
     with open('result.json','w') as json_file:
         json.dump(flattened,json_file)
     
-
 if __name__ == "__main__":
     main()
 
