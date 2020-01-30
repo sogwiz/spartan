@@ -22,11 +22,11 @@ FILE=""
 #if no params supplied, then use the medium file
 if [[ $# -eq 0 ]] ; then
     echo "Using medium File"
-    FILE="https://s3-us-west-2.amazonaws.com/anaik-kops-test/data.zip"
+    FILE="https://prehpemapr-anaik-kops-test.s3-us-west-2.amazonaws.com/data.zip"
 else
     #this is the big file. To use this, just supply any parameter to the shell script
     echo "Using File in folder $1"
-    FILE="https://s3-us-west-2.amazonaws.com/anaik-kops-test/$1/data.zip" 
+    FILE="https://prehpemapr-anaik-kops-test.s3-us-west-2.amazonaws.com/$1/data.zip" 
 fi
 
 echo "Downloading $FILE"
