@@ -4,6 +4,6 @@ idna==2.7
 jsonlines==1.2.0
 requests==2.19.1
 six==1.11.0
-urllib3==1.23
+urllib3==1.26.5
 maprdb-python-client==1.1.1
 ujson
